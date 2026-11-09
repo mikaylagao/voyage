@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>航向布里斯本｜Phonics 與文法有聲闖關</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="航向布里斯本">
+<meta name="theme-color" content="#1E6FD9">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+
+</head>
+<body>
+<div class="app">
+<div class="bar">
+<div class="stat"><span>🔥</span><span id="s-streak">0</span></div>
+<div class="stat"><span>⚡</span><span id="s-xp">0</span></div>
+<div class="stat"><span>⚓</span>Lv <span id="s-lv">1</span></div>
+<div class="grow"></div>
+<button class="bar-btn" id="btn-home" aria-label="回地圖">🗺️</button>
+<button class="bar-btn" id="btn-profile" aria-label="船長日誌">🧭</button>
+</div>
+<section class="screen on" id="scr-map">
+<div class="hero">
+<h1>航向布里斯本</h1>
+<p>從 26 個字母的聲音開始，一路學到 IELTS 文法。每張卡片都能唸給你聽，跟著唸就對了。</p>
+</div>
+<div class="goal">
+<div class="ring" id="goal-ring" style="--p:0"><span id="goal-pct">0%</span></div>
+<div><b>今日目標：50 XP</b><small id="goal-text">今天還沒出航，先選一座島吧。</small></div>
+</div>
+<div class="install" id="install-card"><div class="ico">📲</div><div><b>裝到手機桌面</b><small>像 App 一樣全螢幕開啟，沒有網址列。</small></div><button id="btn-install">安裝</button></div>
+<div class="audio-note" id="audio-note">這個瀏覽器沒有英文語音，請改用 Safari 或 Chrome，並在手機「設定 → 輔助使用 → 朗讀內容」確認已安裝英語（澳洲／英國）語音。</div>
+<div class="map" id="map"></div>
+</section>
+<section class="screen" id="scr-lesson">
+<div class="lesson-top">
+<button class="bar-btn" id="btn-quit" aria-label="離開">✕</button>
+<div class="prog"><i id="prog"></i></div>
+<div class="hearts" id="hearts">❤❤❤❤❤</div>
+</div>
+<div id="lesson-body"></div>
+</section>
+<section class="screen" id="scr-result"><div class="result" id="result-body"></div></section>
+<section class="screen" id="scr-install">
+<div class="hero"><h1>裝成手機 App</h1><p>不用下載、不用帳號。加到桌面後會全螢幕開啟，進度也存在手機裡。</p></div>
+<div class="card" style="margin-top:14px"><h3>iPhone（Safari）</h3><div class="steps">
+<div><div><b>用 Safari 開啟這個頁面</b><small>從其他 App 內開啟時，先點「在瀏覽器開啟」</small></div></div>
+<div><div><b>點下方的分享鈕 <span style="font-size:18px">⎋</span></b><small>方框加一個往上箭頭的那個</small></div></div>
+<div><div><b>往下滑，點「加入主畫面」→「新增」</b></div></div>
+<div><div><b>從桌面圖示開啟</b><small>第一次開啟先按任何一個 🔊，iPhone 才會允許自動發音</small></div></div>
+</div></div>
+<div class="card" style="margin-top:14px"><h3>Android（Chrome）</h3><div class="steps">
+<div><div><b>用 Chrome 開啟這個頁面</b></div></div>
+<div><div><b>點右上角 ⋮ → 「安裝應用程式」或「加到主畫面」</b></div></div>
+<div><div><b>從桌面圖示開啟</b></div></div>
+</div></div>
+<button class="cta ghost" id="btn-install-back">回到地圖</button>
+</section>
+<section class="screen" id="scr-profile">
+<div class="hero"><h1>船長日誌</h1><p>航行紀錄、徽章、字母發音表與免費官方教材。</p></div>
+<div class="rows" id="prof-rows"></div>
+<div class="sec"><h3>字母發音表（點了就唸）</h3><div class="abc" id="abc"></div></div>
+<div class="sec"><h3>徽章</h3><div class="badges" id="badges"></div></div>
+<div class="sec"><h3>免費官方教材（延伸練習）</h3>
+<div class="links">
+<a href="https://ielts.org/take-a-test/preparation-resources" target="_blank" rel="noopener">IELTS 官方免費練習題<small>聽說讀寫四科官方樣題與評分標準</small></a>
+<a href="https://learnenglish.britishcouncil.org/" target="_blank" rel="noopener">British Council LearnEnglish<small>依程度分級的免費文法、聽力與字彙練習</small></a>
+<a href="https://www.cambridgeenglish.org/learning-english/" target="_blank" rel="noopener">Cambridge English 免費學習資源<small>發音、文法與每週練習活動</small></a>
+</div>
+</div>
+<div class="sec">
+<button class="cta ghost" id="btn-theme">切換深色／淺色</button>
+<button class="cta ghost" id="btn-reset" style="margin-top:10px;color:var(--coral)">重設所有進度</button>
+</div>
+</section>
+</div>
+<div class="combo" id="combo"></div>
+<canvas id="confetti"></canvas>
+<script src="js/phonics.js"></script>
+<script src="js/grammar-data.js"></script>
+<script src="js/grammar2.js"></script>
+<script src="js/sfx.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

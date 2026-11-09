@@ -1,0 +1,25 @@
+{
+ "name": "航向布里斯本｜Phonics 與文法有聲闖關",
+ "short_name": "航向布里斯本",
+ "start_url": "./index.html",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#E9F3FA",
+ "theme_color": "#1E6FD9",
+ "lang": "zh-Hant",
+ "icons": [
+  {
+   "src": "icon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "icon-180.png",
+   "sizes": "180x180",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
