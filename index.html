@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>航向布里斯本｜Phonics 與文法有聲闖關</title>
+<title>航向布里斯本｜Phonics、文法與口說有聲闖關</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,14 +30,15 @@
 <section class="screen on" id="scr-map">
 <div class="hero">
 <h1>航向布里斯本</h1>
-<p>從 26 個字母的聲音開始，一路學到 IELTS 文法。每張卡片都能唸給你聽，跟著唸就對了。</p>
+<p>從字母的聲音開始，到分級單字、IELTS 文法與口說。每張卡片都用美式英文唸給你聽，所有關卡都開放，可以直接跳到想學的地方。</p>
 </div>
 <div class="goal">
 <div class="ring" id="goal-ring" style="--p:0"><span id="goal-pct">0%</span></div>
 <div><b>今日目標：50 XP</b><small id="goal-text">今天還沒出航，先選一座島吧。</small></div>
 </div>
+<div class="card level-card" id="level-card"></div>
 <div class="install" id="install-card"><div class="ico">📲</div><div><b>裝到手機桌面</b><small>像 App 一樣全螢幕開啟，沒有網址列。</small></div><button id="btn-install">安裝</button></div>
-<div class="audio-note" id="audio-note">這個瀏覽器沒有英文語音，請改用 Safari 或 Chrome，並在手機「設定 → 輔助使用 → 朗讀內容」確認已安裝英語（澳洲／英國）語音。</div>
+<div class="audio-note" id="audio-note">找不到美式英文語音，發音可能不自然。請改用 Safari 或 Chrome；iPhone 可到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文」下載「美國」語音，也可以到「船長日誌」手動選擇語音。</div>
 <div class="map" id="map"></div>
 </section>
 <section class="screen" id="scr-lesson">
@@ -67,6 +68,8 @@
 <section class="screen" id="scr-profile">
 <div class="hero"><h1>船長日誌</h1><p>航行紀錄、徽章、字母發音表與免費官方教材。</p></div>
 <div class="rows" id="prof-rows"></div>
+<div class="sec"><h3>英文程度（IELTS Band）</h3><p class="tip" style="margin:0">改程度後，推薦關卡、單字、口說題目與語速都會跟著變。</p><div id="prof-band"></div></div>
+<div class="sec"><h3>發音語音（美式英文）</h3><div id="voice-pick" class="voice-pick"></div></div>
 <div class="sec"><h3>字母發音表（點了就唸）</h3><div class="abc" id="abc"></div></div>
 <div class="sec"><h3>徽章</h3><div class="badges" id="badges"></div></div>
 <div class="sec"><h3>免費官方教材（延伸練習）</h3>
@@ -87,6 +90,8 @@
 <script src="js/phonics.js"></script>
 <script src="js/grammar-data.js"></script>
 <script src="js/grammar2.js"></script>
+<script src="js/vocab.js"></script>
+<script src="js/speaking.js"></script>
 <script src="js/sfx.js"></script>
 <script src="js/app.js"></script>
 </body>

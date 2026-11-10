@@ -145,3 +145,63 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:9}
 .steps b{display:block}
 .steps small{color:var(--ink-soft)}
 body{overscroll-behavior-y:none}
+[hidden]{display:none!important}
+.play{white-space:nowrap}
+.play-row{flex-wrap:wrap}
+@media (max-width:420px){.play{font-size:20px;padding:0 16px;height:56px}.play.sm{font-size:16px;height:48px;padding:0 14px}}
+/* 程度卡與跳關 */
+.level-card{margin-top:12px}
+.level-card h3{font-size:19px;margin-bottom:4px}
+.lv-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lv-row small{display:block;color:var(--ink-soft);font-size:13px}
+.lv-row b{font-size:22px;font-weight:900}
+.level-card .cta{margin-top:6px;font-size:16px}
+.jump{display:flex;gap:6px;overflow-x:auto;padding:12px 2px 4px;scrollbar-width:none}
+.jump::-webkit-scrollbar{display:none}
+.jump .chip{flex:none;white-space:nowrap}
+.chip.rec{border-color:var(--ocean);color:var(--ocean)}
+.band-grid{display:grid;gap:8px;margin-top:8px}
+.band-btn{display:flex;align-items:center;gap:12px;text-align:left;padding:10px 14px;border-radius:16px;background:var(--card);border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}
+.band-btn b{font-size:26px;font-weight:900;color:var(--ocean);min-width:28px;text-align:center}
+.band-btn small{color:var(--ink-soft);font-size:14px;line-height:1.35}
+.band-btn.on{border-color:var(--ocean);background:color-mix(in srgb,var(--ocean) 12%,var(--card));box-shadow:0 3px 0 var(--ocean-dark)}
+.band-btn:active{transform:translateY(3px);box-shadow:none}
+.pills{display:flex;gap:6px;margin:4px 0 2px}
+.pill{display:inline-block;font-size:12px;font-weight:900;padding:2px 10px;border-radius:999px;background:var(--sea);color:var(--ink-soft)}
+.pill.rec{background:var(--ocean);color:#fff}
+.world.rec .world-head h2{color:var(--ocean)}
+.voice-pick{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.voice-pick select{flex:1;min-width:0;max-width:100%;font:inherit;padding:10px 12px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+.voice-pick .tip{flex-basis:100%}
+/* 拼讀積木 */
+.blk .kw{font-size:11px;color:var(--ocean);font-weight:700;margin-top:2px}
+.blk.silent{opacity:.5;border-style:dashed}
+.blk.stress{background:color-mix(in srgb,var(--coral) 22%,var(--card));border-color:var(--coral)}
+.blk.stress .ipa{color:var(--coral);font-weight:900}
+/* 單字卡 */
+.big-word .W{font-size:clamp(32px,10vw,52px);overflow-wrap:anywhere}
+.ipa-big{font-size:20px;color:var(--ocean);font-weight:700;margin-top:4px}
+.sent.sm{font-size:20px}
+.ex-box{background:var(--sea);border-radius:16px;padding:12px 14px;margin-top:10px;display:grid;gap:6px}
+.ex-box .play{justify-self:start;height:42px;font-size:16px}
+/* 口語練習 */
+.sp-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+.sp-hint{font-size:14px;font-weight:700;color:var(--ink-soft)}
+.sp-q.hidden{display:none}
+.cue{margin:8px 0 0;padding-left:20px;color:var(--ink-soft)}
+.rec-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin:14px 0 4px}
+.rec{width:88px;height:88px;border-radius:50%;background:var(--coral);color:#fff;font-size:36px;box-shadow:0 6px 0 color-mix(in srgb,var(--coral) 60%,#000);transition:transform .1s}
+.rec:active{transform:translateY(4px);box-shadow:none}
+.rec.on{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--coral) 55%,transparent)}50%{box-shadow:0 0 0 14px transparent}}
+@media (prefers-reduced-motion:reduce){.rec.on{animation:none;outline:4px solid var(--coral);outline-offset:4px}}
+.rec-label{font-size:14px;color:var(--ink-soft);text-align:center}
+.transcript{margin-top:10px;padding:12px 14px;border-radius:14px;border:2px dashed var(--sea-deep);font-size:18px;font-weight:700}
+.transcript small{display:block;font-size:13px;color:var(--ink-soft);font-weight:500}
+.transcript i{color:var(--ink-soft)}
+#playback{width:100%;margin-top:10px}
+.model{margin-top:12px;padding:14px;border-radius:16px;background:color-mix(in srgb,var(--leaf) 14%,var(--card));border:2px solid color-mix(in srgb,var(--leaf) 45%,var(--line))}
+.model b{color:var(--leaf-dark)}
+.model .play-row{justify-content:flex-start;margin:10px 0 0}
+.sp-actions{display:grid;gap:0}
+.self{display:flex;gap:8px;flex-wrap:wrap}
