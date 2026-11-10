@@ -73,7 +73,7 @@ if(!S.band){el.innerHTML=`<h3>先選你的英文程度</h3><p class="tip" style=
 const nx=nextIndex();const t=nx>=0?ALL[nx]:null;
 el.innerHTML=`<div class="lv-row"><div><small>目前程度</small><b>IELTS Band ${S.band}</b></div><button class="chip" id="lv-change">更改程度</button></div><p class="tip" style="margin:4px 0 10px">${BANDS[S.band].d}</p>
 ${t?`<button class="cta" id="lv-go">▶ 從推薦關卡開始：${WORLDS[t.w].units[t.u].t}</button>`:`<p><b>推薦關卡都完成了！</b>可以挑戰更高程度。</p>`}
-<div class="jump">${WORLDS.map((w,i)=>`<button class="chip ${isRec(w)?"rec":""}" data-w="${i}">${w.icon} ${w.name.split(" ")[0]}</button>`).join("")}</div>`;
+<div class="jump">${WORLDS.map((w,i)=>`<button class="chip ${isRec(w)?"reco":""}" data-w="${i}">${w.icon} ${w.name.split(" ")[0]}</button>`).join("")}</div>`;
 $("#lv-change").onclick=()=>{el.innerHTML=`<h3>選擇英文程度</h3><div id="bp"></div>`;bandPicker($("#bp"),()=>{renderLevel();renderMap()})};
 if(t)$("#lv-go").onclick=()=>startLesson(t.w,t.u);
 el.querySelectorAll(".jump .chip").forEach(c=>c.onclick=()=>document.getElementById("world-"+c.dataset.w).scrollIntoView({behavior:"smooth",block:"start"}));
@@ -83,9 +83,9 @@ function renderMap(){
 renderLevel();
 const nx=nextIndex();const m=$("#map");m.innerHTML="";
 WORLDS.forEach((w,wi)=>{
-const sec=document.createElement("div");sec.className="world"+(isRec(w)?" rec":"");sec.id="world-"+wi;
+const sec=document.createElement("div");sec.className="world"+(isRec(w)?" reco":"");sec.id="world-"+wi;
 const range=w.band[0]===w.band[1]?`Band ${w.band[0]}`:w.band[0]===3&&w.band[1]===7?"所有程度":`Band ${w.band[0]}–${w.band[1]}`;
-sec.innerHTML=`<div class="world-head"><h2>${w.icon} ${w.name}</h2><div class="pills"><span class="pill">${range}</span>${isRec(w)?`<span class="pill rec">推薦</span>`:""}</div><span>${w.sub}</span></div><div class="sea-path"></div>`;
+sec.innerHTML=`<div class="world-head"><h2>${w.icon} ${w.name}</h2><div class="pills"><span class="pill">${range}</span>${isRec(w)?`<span class="pill reco">推薦</span>`:""}</div><span>${w.sub}</span></div><div class="sea-path"></div>`;
 const path=sec.querySelector(".sea-path");
 w.units.forEach((u,ui)=>{
 const idx=ALL.findIndex(x=>x.w===wi&&x.u===ui);const id=ALL[idx].id;
