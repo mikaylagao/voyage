@@ -51,7 +51,12 @@ if("speechSynthesis"in window){pickVoice();speechSynthesis.onvoiceschanged=pickV
 function utter(t,rate){const u=new SpeechSynthesisUtterance(t);if(VOICE)u.voice=VOICE;u.lang=VOICE?VOICE.lang:"en-US";u.rate=rate||RATE;return u}
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 function say(t,rate){return new Promise(res=>{if(!("speechSynthesis"in window)||!t)return res();speechSynthesis.cancel();const u=utter(t,rate);u.onend=u.onerror=()=>res();speechSynthesis.speak(u);setTimeout(res,1800)})}
-function speak(t,btn,rate){if(!("speechSynthesis"in window)||!t)return;speechSynthesis.cancel();const u=utter(t,rate);
+let SEQ=0;
+/* 分段朗讀：每段之間停 gap 毫秒（字母音與範例字分開唸） */
+async function speakParts(parts,btn,rate,gap=800){if(!("speechSynthesis"in window))return;const my=++SEQ;btn&&btn.classList.add("playing");
+for(let i=0;i<parts.length;i++){if(my!==SEQ)return;await new Promise(res=>{speechSynthesis.cancel();const u=utter(parts[i],rate);u.onend=u.onerror=()=>res();speechSynthesis.speak(u);setTimeout(res,5000)});if(i<parts.length-1)await wait(gap)}
+if(my===SEQ&&btn)btn.classList.remove("playing")}
+function speak(t,btn,rate){if(!("speechSynthesis"in window)||!t)return;SEQ++;speechSynthesis.cancel();const u=utter(t,rate);
 if(btn){btn.classList.add("playing");u.onend=u.onerror=()=>btn.classList.remove("playing")}speechSynthesis.speak(u)}
 function stopAll(){if("speechSynthesis"in window)speechSynthesis.cancel();if(window.stopRec)stopRec()}
 function applyBand(){RATE=BANDS[band()].rate;buildWorlds()}
@@ -129,8 +134,8 @@ if(c.say)$("#p1").onclick=e=>speak(c.say,e.currentTarget);
 }else if(c.k==="letter"){
 b.innerHTML=`<div class="card">${tag}<div class="big-letter"><div class="L">${c.L}<small>${c.L.toLowerCase()}</small></div><div class="snd">聲音 ${c.s}</div><div class="zh">${c.w} ${c.zh}</div></div>
 <div class="play-row"><button class="play" id="p1">🔊 ${c.L} · ${c.w}</button><button class="play sm" id="p2" aria-label="只唸單字">${c.w}</button></div>${speedRow()}<p class="tip">嘴型：${c.tip}。跟著唸三次：${c.L}，${c.L}，${c.w}。</p>${c.adv?`<div class="ex" style="display:flex;align-items:center;gap:8px;background:var(--sea);border-radius:14px;padding:10px 12px;margin-top:10px"><div style="flex:1"><b>進階字：${c.adv}</b><span class="zh" style="display:block;font-size:14px">${c.advzh}</span></div><button class="spk play sm" id="p3" style="height:40px;min-width:40px;font-size:16px">🔊</button></div>`:""}</div>${next}`;
-$("#p1").onclick=e=>speak(c.say,e.currentTarget);$("#p2").onclick=e=>speak(c.w,e.currentTarget);if(c.adv)$("#p3").onclick=e=>speak(c.adv,e.currentTarget);bindSpeed(b);
-setTimeout(()=>speak(c.say,$("#p1")),250);
+const playL=btn=>c.parts?speakParts(c.parts,btn):speak(c.say,btn);$("#p1").onclick=e=>playL(e.currentTarget);$("#p2").onclick=e=>speak(c.w,e.currentTarget);if(c.adv)$("#p3").onclick=e=>speak(c.adv,e.currentTarget);bindSpeed(b);
+setTimeout(()=>playL($("#p1")),250);
 }else if(c.k==="word"){
 const {syl,segs}=wordBlocks(c);const word=(c.say||c.w).replace(/·/g,"");
 const blocks=segs.map((s,i)=>`<button class="blk ${s.silent?"silent":""} ${syl&&s.ipa?"stress":""}" data-i="${i}"><span class="g">${s.g}</span><span class="ipa">${s.ipa}</span>${s.kw?`<span class="kw">像 ${s.say}</span>`:""}</button>`).join('<span class="plus">+</span>');

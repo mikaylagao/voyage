@@ -1,4 +1,4 @@
-const CACHE="voyage-v7";
+const CACHE="voyage-v8";
 const FILES=["./","./index.html","./css/app.css","./js/phonics.js","./js/grammar-data.js","./js/grammar2.js","./js/vocab.js","./js/speaking.js","./js/sfx.js","./js/app.js","./manifest.json","./icon-180.png","./icon.svg"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

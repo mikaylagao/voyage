@@ -37,7 +37,7 @@ const VOWEL={a:["短母音 a /æ/","嘴巴往兩邊拉開，像看到驚喜的�
 function letterUnit(from,to){
 const cards=[];
 cards.push({k:"info",h:`字母 ${ABC[from][0]} 到 ${ABC[to][0]}`,p:"每個字母有「名字」和「聲音」。拼字時用名字，唸單字時用聲音。先聽，再按 🔊 跟著唸三次。"});
-for(let i=from;i<=to;i++){const [L,s,w,zh,tip,adv,advzh]=ABC[i];cards.push({k:"letter",L,s,w,zh,tip,adv,advzh,say:`${L}. ${L.toLowerCase()}. ${w}.`})}
+for(let i=from;i<=to;i++){const [L,s,w,zh,tip,adv,advzh]=ABC[i];cards.push({k:"letter",L,s,w,zh,tip,adv,advzh,say:`${L}. ${L.toLowerCase()}. ${w}.`,parts:[`${L}. ${L.toLowerCase()}.`,`${w}.`]})}
 for(let i=from;i<=to;i+=2){const [L,s,w]=ABC[i];const pool=ABC.slice(from,to+1).map(x=>x[2]).filter(x=>x!==w);shuffle(pool);cards.push({k:"listen",say:w,o:shuffle([w,pool[0],pool[1]]),a:w,e:startsWith(L,w)?`${w} 開頭是 ${L} 的聲音 ${s}。`:`${w} 裡面有 ${L} 的聲音 ${s}。`})}
 for(let i=from+1;i<=to;i+=2){const [L,s,w]=ABC[i];const pool=ABC.slice(from,to+1).map(x=>x[0]).filter(x=>x!==L);shuffle(pool);cards.push({k:"listen",say:w,prompt:startsWith(L,w)?"聽到的字，開頭是哪個字母？":"聽到的字裡，有哪個字母的聲音？",o:shuffle([L,pool[0],pool[1]]),a:L,e:startsWith(L,w)?`${w} 的開頭是 ${L} ${s}。`:`${w} 裡的 x 唸 ${s}。`})}
 return cards;
