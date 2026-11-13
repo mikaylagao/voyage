@@ -34,10 +34,12 @@ i:[["-in",["pin","bin","fin","win","tin"],["別針","垃圾桶","魚鰭","贏","
 o:[["-ot",["hot","pot","dot","not","lot"],["熱的","鍋子","點","不","很多"]],["-og",["dog","log","fog","jog","hog"],["狗","木頭","霧","慢跑","豬"]],["-op",["hop","top","mop","pop","shop"],["跳","頂部","拖把","啵一聲","商店"]]],
 u:[["-un",["sun","bun","run","fun","gun"],["太陽","小圓麵包","跑","好玩","槍"]],["-ug",["bug","mug","hug","rug","jug"],["蟲","馬克杯","擁抱","小地毯","水壺"]],["-ut",["cut","nut","hut","but","shut"],["切","堅果","小屋","但是","關上"]]]};
 const VOWEL={a:["短母音 a /æ/","嘴巴往兩邊拉開，像看到驚喜的「ㄝ」。中間是 a 的字，先試著唸 /æ/。"],e:["短母音 e /ɛ/","嘴微開，短促的「ㄝ」，不要拉長。"],i:["短母音 i /ɪ/","短而鬆的「ㄧ」，嘴不要用力。"],o:["短母音 o /ɑ/","美式發音：嘴巴張大、不圓唇，像「ㄚ」。hot 唸 /hɑt/。"],u:["短母音 u /ʌ/","放鬆的「ㄚ」，很短。"]};
+/* 字母卡的「聲音」朗讀：用 PH 找同一個 IPA 的近似音（短 a / i 唸代表字） */
+function sndSay(ipa){const ks=Object.keys(PH).filter(k=>PH[k][1]===ipa);const k=ks.find(k=>k.length===1)||ks[0];return k?PH[k][0]:ipa.replace(/\//g,"")}
 function letterUnit(from,to){
 const cards=[];
 cards.push({k:"info",h:`字母 ${ABC[from][0]} 到 ${ABC[to][0]}`,p:"每個字母有「名字」和「聲音」。拼字時用名字，唸單字時用聲音。先聽，再按 🔊 跟著唸三次。"});
-for(let i=from;i<=to;i++){const [L,s,w,zh,tip,adv,advzh]=ABC[i];cards.push({k:"letter",L,s,w,zh,tip,adv,advzh,say:`${L}. ${L.toLowerCase()}. ${w}.`,parts:[`${L}. ${L.toLowerCase()}.`,`${w}.`]})}
+for(let i=from;i<=to;i++){const [L,s,w,zh,tip,adv,advzh]=ABC[i];const sd=sndSay(s);cards.push({k:"letter",L,s,w,zh,tip,adv,advzh,say:`${L}. ${L.toLowerCase()}. ${sd}. ${w}.`,parts:[`${L}. ${L.toLowerCase()}.`,`${sd}.`,`${w}.`]})}
 for(let i=from;i<=to;i+=2){const [L,s,w]=ABC[i];const pool=ABC.slice(from,to+1).map(x=>x[2]).filter(x=>x!==w);shuffle(pool);cards.push({k:"listen",say:w,o:shuffle([w,pool[0],pool[1]]),a:w,e:startsWith(L,w)?`${w} 開頭是 ${L} 的聲音 ${s}。`:`${w} 裡面有 ${L} 的聲音 ${s}。`})}
 for(let i=from+1;i<=to;i+=2){const [L,s,w]=ABC[i];const pool=ABC.slice(from,to+1).map(x=>x[0]).filter(x=>x!==L);shuffle(pool);cards.push({k:"listen",say:w,prompt:startsWith(L,w)?"聽到的字，開頭是哪個字母？":"聽到的字裡，有哪個字母的聲音？",o:shuffle([L,pool[0],pool[1]]),a:L,e:startsWith(L,w)?`${w} 的開頭是 ${L} ${s}。`:`${w} 裡的 x 唸 ${s}。`})}
 return cards;
