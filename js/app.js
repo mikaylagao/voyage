@@ -144,12 +144,18 @@ const {syl,segs}=wordBlocks(c);const word=(c.say||c.w).replace(/·/g,"");
 const blocks=segs.map((s,i)=>`<button class="blk ${s.silent?"silent":""} ${syl&&s.ipa?"stress":""}" data-i="${i}"><span class="g">${s.g}</span><span class="ipa">${s.ipa}</span>${s.kw?`<span class="kw">像 ${s.say}</span>`:""}</button>`).join('<span class="plus">+</span>');
 b.innerHTML=`<div class="card">${tag}<div class="big-word"><div class="W">${hl(c.w,c.hl)}</div><div class="zh">${c.zh}</div></div>
 <div class="blocks">${blocks}</div>
-<div class="play-row"><button class="play sm" id="p3">${syl?"🥁 一拍一拍唸":"🧩 一塊一塊唸"}</button><button class="play" id="p1">🔊 拼起來</button></div>${c.tip?`<p class="tip">${c.tip}</p>`:""}<p class="tip">${syl?"每塊是一個音節，標色的是重音。點積木會慢速唸整個字。":"點每塊積木聽單一聲音。a、i、短 oo 很難單獨唸，會用代表字（apple／igloo／book）示範。灰色積木不發音。"}</p></div>${next}`;
+<div class="play-row"><button class="play sm" id="p3">${syl?"🥁 一拍一拍唸":"🧩 一塊一塊唸"}</button><button class="play" id="p1">🔊 拼起來</button></div>${c.tip?`<p class="tip">${c.tip}</p>`:""}<p class="tip">${syl?"每塊是一個音節，標色的是重音。點積木會慢速唸整個字。":"先一個一個聲音唸，再拼成整個字。短 a、i 很難單獨唸，會和後面的子音一起唸（c + at → cat）。點每塊積木可單獨聽。灰色積木不發音。"}</p></div>${next}`;
 $("#p1").onclick=e=>speak(word,e.currentTarget);
 b.querySelectorAll(".blk").forEach(k=>k.onclick=()=>{k.classList.add("hit");setTimeout(()=>k.classList.remove("hit"),400);if(syl)speak(word,null,.6);else if(segs[+k.dataset.i].say)speak(segs[+k.dataset.i].say,null,.8)});
-$("#p3").onclick=async e=>{const bl=b.querySelectorAll(".blk");if(syl){for(let i=0;i<segs.length;i++){bl[i].classList.add("hit");await wait(380);bl[i].classList.remove("hit")}speak(word,$("#p1"),.6);return}
-for(let i=0;i<segs.length;i++){if(segs[i].silent)continue;bl[i].classList.add("hit");await say(segs[i].say,.75);bl[i].classList.remove("hit");await wait(120)}await wait(250);speak(word,$("#p1"),.7)};
-setTimeout(()=>speak(word,$("#p1")),250);
+/* 拼讀流程：逐一唸每個聲音再拼起來。短 a / i 無法單獨唸準，就和後面的子音合唸（c + at → cat） */
+const plan=[];for(let i=0;i<segs.length;i++){const s=segs[i];if(s.silent||!s.say)continue;const n=segs[i+1];
+if(s.kw&&/^[ai]$/.test(s.g)&&n&&!n.silent&&n.ipa&&!/[aeiouy]/.test(n.g)){plan.push({ix:[i,i+1],say:s.g+n.g.replace(/(.)/,"$1")});i++}else plan.push({ix:[i],say:s.say})}
+const blend=async btn=>{const my=++SEQ;const bl=b.querySelectorAll(".blk");btn&&btn.classList.add("playing");
+if(syl){for(let i=0;i<segs.length;i++){if(my!==SEQ)return;bl[i].classList.add("hit");await wait(380);bl[i].classList.remove("hit")}}
+else for(const p of plan){if(my!==SEQ)return;p.ix.forEach(i=>bl[i].classList.add("hit"));await say(p.say,.75);p.ix.forEach(i=>bl[i].classList.remove("hit"));await wait(300)}
+if(my!==SEQ)return;btn&&btn.classList.remove("playing");await wait(250);if(my===SEQ)speak(word,$("#p1"),syl?.6:.8)};
+$("#p3").onclick=e=>blend(e.currentTarget);
+setTimeout(()=>syl?speak(word,$("#p1")):blend($("#p3")),250);
 }else if(c.k==="sent"){
 b.innerHTML=`<div class="card">${tag}<div class="sent">${c.en}</div><div class="zh">${c.zh}</div>
 <div class="play-row"><button class="play" id="p1">🔊 聽句子</button><button class="play sm" id="p2">🐢 慢速</button></div><p class="tip">聽完後按暫停跟讀一次，再按下一張。</p></div>${next}`;
