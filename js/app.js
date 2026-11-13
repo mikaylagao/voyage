@@ -54,9 +54,20 @@ function utter(t,rate){const u=new SpeechSynthesisUtterance(t);if(VOICE)u.voice=
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 function say(t,rate){return new Promise(res=>{if(!("speechSynthesis"in window)||!t)return res();speechSynthesis.cancel();const u=utter(t,rate);u.onend=u.onerror=()=>res();speechSynthesis.speak(u);setTimeout(res,1800)})}
 let SEQ=0;
+/* 短母音音檔：用 Web Audio 播放（iOS 不需每次點擊才能播；靜音鍵下也照常發聲） */
+let ACX=null;const BUF={};
+try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+function acx(){if(!ACX){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;ACX=new A()}if(ACX.state==="suspended")ACX.resume();return ACX}
+document.addEventListener("touchend",()=>acx(),{once:true});document.addEventListener("click",()=>acx(),{once:true});
+async function clip(n){const c=acx();if(!c)return;try{if(!BUF[n])BUF[n]=await fetch("assets/snd/"+n+".mp3").then(r=>r.arrayBuffer()).then(b=>new Promise((ok,no)=>c.decodeAudioData(b,ok,no)))}catch(e){return}
+return new Promise(res=>{const s=c.createBufferSource();s.buffer=BUF[n];s.connect(c.destination);s.onended=()=>res();s.start();setTimeout(res,BUF[n].duration*1000+300)})}
+function sayPart(p,rate){return p&&typeof p==="object"?clip(p.clip):say(p,rate)}
+/* 積木：先唸字母名稱，再唸音標的聲音 */
+function letterName(g){return g.replace(/-/g,"").toUpperCase().split("").join(", ")+"."}
+function blockSound(s){return s.clip?{clip:s.clip}:s.say+"."}
 /* 分段朗讀：每段之間停 gap 毫秒（字母音與範例字分開唸） */
 async function speakParts(parts,btn,rate,gap=800){if(!("speechSynthesis"in window))return;const my=++SEQ;btn&&btn.classList.add("playing");
-for(let i=0;i<parts.length;i++){if(my!==SEQ)return;await new Promise(res=>{speechSynthesis.cancel();const u=utter(parts[i],rate);u.onend=u.onerror=()=>res();speechSynthesis.speak(u);setTimeout(res,Math.max(5000,parts[i].split(/\s+/).length*700/(rate||RATE)))});if(i<parts.length-1)await wait(gap)}
+for(let i=0;i<parts.length;i++){if(my!==SEQ)return;if(typeof parts[i]==="object"){await clip(parts[i].clip)}else await new Promise(res=>{speechSynthesis.cancel();const u=utter(parts[i],rate);u.onend=u.onerror=()=>res();speechSynthesis.speak(u);setTimeout(res,Math.max(5000,parts[i].split(/\s+/).length*700/(rate||RATE)))});if(i<parts.length-1)await wait(gap)}
 if(my===SEQ&&btn)btn.classList.remove("playing")}
 function speak(t,btn,rate){if(!("speechSynthesis"in window)||!t)return;SEQ++;speechSynthesis.cancel();const u=utter(t,rate);
 if(btn){btn.classList.add("playing");u.onend=u.onerror=()=>btn.classList.remove("playing")}speechSynthesis.speak(u)}
@@ -141,17 +152,17 @@ const playL=btn=>c.parts?speakParts(c.parts,btn):speak(c.say,btn);$("#p1").oncli
 setTimeout(()=>playL($("#p1")),250);
 }else if(c.k==="word"){
 const {syl,segs}=wordBlocks(c);const word=(c.say||c.w).replace(/·/g,"");
-const blocks=segs.map((s,i)=>`<button class="blk ${s.silent?"silent":""} ${syl&&s.ipa?"stress":""}" data-i="${i}"><span class="g">${s.g}</span><span class="ipa">${s.ipa}</span>${s.kw?`<span class="kw">像 ${s.say}</span>`:""}</button>`).join('<span class="plus">+</span>');
+const blocks=segs.map((s,i)=>`<button class="blk ${s.silent?"silent":""} ${syl&&s.ipa?"stress":""}" data-i="${i}"><span class="g">${s.g}</span><span class="ipa">${s.ipa}</span></button>`).join('<span class="plus">+</span>');
 b.innerHTML=`<div class="card">${tag}<div class="big-word"><div class="W">${hl(c.w,c.hl)}</div><div class="zh">${c.zh}</div></div>
 <div class="blocks">${blocks}</div>
-<div class="play-row"><button class="play sm" id="p3">${syl?"🥁 一拍一拍唸":"🧩 一塊一塊唸"}</button><button class="play" id="p1">🔊 拼起來</button></div>${c.tip?`<p class="tip">${c.tip}</p>`:""}<p class="tip">${syl?"每塊是一個音節，標色的是重音。點積木會慢速唸整個字。":"先一個一個聲音唸，再拼成整個字。點每塊積木可單獨聽那個聲音。灰色積木不發音。"}</p></div>${next}`;
+<div class="play-row"><button class="play sm" id="p3">${syl?"🥁 一拍一拍唸":"🧩 一塊一塊唸"}</button><button class="play" id="p1">🔊 拼起來</button></div>${c.tip?`<p class="tip">${c.tip}</p>`:""}<p class="tip">${syl?"每塊是一個音節，標色的是重音。點積木會慢速唸整個字。":"每塊積木先唸字母，停一下再唸它的音標聲音，最後拼成整個字。點每塊積木可單獨聽。灰色積木不發音。"}</p></div>${next}`;
 $("#p1").onclick=e=>speak(word,e.currentTarget);
-b.querySelectorAll(".blk").forEach(k=>k.onclick=()=>{k.classList.add("hit");setTimeout(()=>k.classList.remove("hit"),400);if(syl)speak(word,null,.6);else if(segs[+k.dataset.i].say)speak(segs[+k.dataset.i].say,null,.8)});
-/* 拼讀流程：一個聲音一個聲音唸（中間停頓），最後拼成整個字 */
-const plan=[];segs.forEach((s,i)=>{if(!s.silent&&s.say)plan.push({ix:[i],say:s.say})});
+b.querySelectorAll(".blk").forEach(k=>k.onclick=()=>{k.classList.add("hit");setTimeout(()=>k.classList.remove("hit"),400);if(syl)speak(word,null,.6);else blockOne(segs[+k.dataset.i])});
+const blockOne=async sg=>{const my=++SEQ;await say(letterName(sg.g),.8);if(sg.silent||my!==SEQ)return;await wait(700);if(my===SEQ)await sayPart(blockSound(sg),.8)};
+/* 拼讀流程：每塊先唸字母 → 停頓 → 唸音標聲音，全部唸完再拼起整個字 */
 const blend=async btn=>{const my=++SEQ;const bl=b.querySelectorAll(".blk");btn&&btn.classList.add("playing");
 if(syl){for(let i=0;i<segs.length;i++){if(my!==SEQ)return;bl[i].classList.add("hit");await wait(380);bl[i].classList.remove("hit")}}
-else for(const p of plan){if(my!==SEQ)return;p.ix.forEach(i=>bl[i].classList.add("hit"));await say(p.say,.75);p.ix.forEach(i=>bl[i].classList.remove("hit"));await wait(700)}
+else for(let i=0;i<segs.length;i++){const sg=segs[i];if(my!==SEQ)return;bl[i].classList.add("hit");await say(letterName(sg.g),.8);if(my!==SEQ)return;if(!sg.silent){await wait(700);if(my!==SEQ)return;await sayPart(blockSound(sg),.75)}bl[i].classList.remove("hit");await wait(700)}
 if(my!==SEQ)return;btn&&btn.classList.remove("playing");await wait(900);if(my===SEQ)speak(word,$("#p1"),syl?.6:.8)};
 $("#p3").onclick=e=>blend(e.currentTarget);
 setTimeout(()=>syl?speak(word,$("#p1")):blend($("#p3")),250);

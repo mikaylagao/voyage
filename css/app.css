@@ -174,7 +174,6 @@ body{overscroll-behavior-y:none}
 .voice-pick select{flex:1;min-width:0;max-width:100%;font:inherit;padding:10px 12px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
 .voice-pick .tip{flex-basis:100%}
 /* 拼讀積木 */
-.blk .kw{font-size:11px;color:var(--ocean);font-weight:700;margin-top:2px}
 .blk.silent{opacity:.5;border-style:dashed}
 .blk.stress{background:color-mix(in srgb,var(--coral) 22%,var(--card));border-color:var(--coral)}
 .blk.stress .ipa{color:var(--coral);font-weight:900}
