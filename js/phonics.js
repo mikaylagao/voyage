@@ -5,9 +5,9 @@ const ABC=[
 /* PH[key] = [機器朗讀用的近似音, 美式 IPA]。短母音語音引擎唸不準，改播 assets/snd/ 的音檔（見 CLIP）。 */
 const PH={b:["buh","/b/"],c:["kuh","/k/"],k:["kuh","/k/"],ck:["kuh","/k/"],d:["duh","/d/"],f:["fuh","/f/"],ph:["fuh","/f/"],g:["guh","/g/"],h:["huh","/h/"],j:["juh","/dʒ/"],l:["luh","/l/"],m:["muh","/m/"],n:["nuh","/n/"],p:["puh","/p/"],q:["kwuh","/kw/"],qu:["kwuh","/kw/"],r:["ruh","/r/"],s:["suh","/s/"],t:["tuh","/t/"],v:["vuh","/v/"],w:["wuh","/w/"],wh:["wuh","/w/"],x:["kss","/ks/"],y:["yuh","/j/"],z:["zuh","/z/"],
 sh:["shh","/ʃ/"],ch:["chuh","/tʃ/"],tch:["chuh","/tʃ/"],th:["thuh","/θ/"],dh:["the","/ð/"],ng:["ung","/ŋ/"],
-a:["apple","/æ/"],e:["eh","/ɛ/"],i:["igloo","/ɪ/"],o:["ah","/ɑ/"],u:["uh","/ʌ/"],schwa:["uh","/ə/"],
+a:["aah","/æ/"],e:["eh","/ɛ/"],i:["ih","/ɪ/"],o:["ah","/ɑ/"],u:["uh","/ʌ/"],schwa:["uh","/ə/"],
 a_e:["ay","/eɪ/"],ai:["ay","/eɪ/"],ay:["ay","/eɪ/"],e_e:["ee","/i/"],ee:["ee","/i/"],ea:["ee","/i/"],i_e:["eye","/aɪ/"],igh:["eye","/aɪ/"],ie:["eye","/aɪ/"],o_e:["oh","/oʊ/"],oa:["oh","/oʊ/"],ow:["oh","/oʊ/"],u_e:["you","/ju/"],ue:["you","/ju/"],ew:["you","/ju/"],
-oo:["ooh","/u/"],uu:["book","/ʊ/"],ou:["ow","/aʊ/"],ar:["are","/ɑr/"],or:["or","/ɔr/"],er:["er","/ɝ/"],ir:["er","/ɝ/"],ur:["er","/ɝ/"],aw:["aw","/ɔ/"],au:["aw","/ɔ/"],oi:["oy","/ɔɪ/"],oy:["oy","/ɔɪ/"],air:["air","/ɛr/"],le:["ul","/əl/"],silent:["","不發音"]};
+oo:["ooh","/u/"],uu:["uh","/ʊ/"],ou:["ow","/aʊ/"],ar:["are","/ɑr/"],or:["or","/ɔr/"],er:["er","/ɝ/"],ir:["er","/ɝ/"],ur:["er","/ɝ/"],aw:["aw","/ɔ/"],au:["aw","/ɔ/"],oi:["oy","/ɔɪ/"],oy:["oy","/ɔɪ/"],air:["air","/ɛr/"],le:["ul","/əl/"],silent:["","不發音"]};
 /* 短母音音檔：IPA → assets/snd/<名稱>.mp3（tools/make-vowels.sh 以 espeak-ng 產生） */
 const CLIP={"/æ/":"ae","/ɛ/":"eh","/ɪ/":"ih","/ɑ/":"ah","/ʌ/":"uh","/ʊ/":"uu","/ə/":"schwa"};
 /* OVERRIDE：規則切不準的字。格式 "字母組" 或 "字母組:聲音 key" */

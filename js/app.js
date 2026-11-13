@@ -162,8 +162,8 @@ const blockOne=async sg=>{const my=++SEQ;await say(letterName(sg.g),.8);if(sg.si
 /* 拼讀流程：每塊先唸字母 → 停頓 → 唸音標聲音，全部唸完再拼起整個字 */
 const blend=async btn=>{const my=++SEQ;const bl=b.querySelectorAll(".blk");btn&&btn.classList.add("playing");
 if(syl){for(let i=0;i<segs.length;i++){if(my!==SEQ)return;bl[i].classList.add("hit");await wait(380);bl[i].classList.remove("hit")}}
-else for(let i=0;i<segs.length;i++){const sg=segs[i];if(my!==SEQ)return;bl[i].classList.add("hit");await say(letterName(sg.g),.8);if(my!==SEQ)return;if(!sg.silent){await wait(700);if(my!==SEQ)return;await sayPart(blockSound(sg),.75)}bl[i].classList.remove("hit");await wait(450)}
-if(my!==SEQ)return;btn&&btn.classList.remove("playing");await wait(250);if(my===SEQ)speak(word,$("#p1"),syl?.6:.8)};
+else for(let i=0;i<segs.length;i++){const sg=segs[i];if(my!==SEQ)return;bl[i].classList.add("hit");await say(letterName(sg.g),.8);if(my!==SEQ)return;if(!sg.silent){await wait(700);if(my!==SEQ)return;await sayPart(blockSound(sg),.75)}bl[i].classList.remove("hit");await wait(700)}
+if(my!==SEQ)return;btn&&btn.classList.remove("playing");await wait(900);if(my===SEQ)speak(word,$("#p1"),syl?.6:.8)};
 $("#p3").onclick=e=>blend(e.currentTarget);
 setTimeout(()=>syl?speak(word,$("#p1")):blend($("#p3")),250);
 }else if(c.k==="sent"){
