@@ -14,16 +14,16 @@ GRAMMAR.forEach(w=>w.units.forEach(u=>{u.cards=(window.grammarUnit2||grammarUnit
 const $=s=>document.querySelector(s);
 /* ---------- 程度：IELTS Band 3–7 ---------- */
 const BANDS={
-3:{d:"幾乎從零開始：字母、發音、最常用的生活單字",rate:.75},
-4:{d:"會一點基礎：短句溝通、旅行常用字、基礎文法",rate:.82},
-5:{d:"能聊日常話題：時態、比較、說出理由",rate:.9},
-6:{d:"能討論議題：完成式、被動、關係子句、論述字彙",rate:.95},
-7:{d:"目標高分：進階句型、抽象議題、學術字彙",rate:1}};
+3:{d:"幾乎從零開始：字母、發音、最常用的生活單字",rate:.88},
+4:{d:"會一點基礎：短句溝通、旅行常用字、基礎文法",rate:.92},
+5:{d:"能聊日常話題：時態、比較、說出理由",rate:.96},
+6:{d:"能討論議題：完成式、被動、關係子句、論述字彙",rate:1},
+7:{d:"目標高分：進階句型、抽象議題、學術字彙",rate:1.03}};
 /* 每座島適合的程度範圍；地圖會把符合目前程度的島標成「推薦」 */
 const WB={p1:[3,3],p2:[3,4],p3:[3,4],p4:[3,5],w2:[4,5],w3:[5,6],w4:[6,7],w5:[6,7]};
 /* ---------- 狀態 ---------- */
 const KEY="ielts-voyage-v2";
-const DEFAULT={xp:0,done:{},stars:{},streak:0,last:"",todayXP:0,todayDate:"",badges:[],perfect:0,band:0,voice:""};
+const DEFAULT={xp:0,done:{},stars:{},streak:0,last:"",todayXP:0,todayDate:"",badges:[],perfect:0,band:0,voice:"",wrong:{},drafts:{}};
 let S=load();
 function load(){try{const r=localStorage.getItem(KEY);return r?Object.assign({},DEFAULT,JSON.parse(r)):{...DEFAULT}}catch(e){return {...DEFAULT}}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -34,7 +34,8 @@ function lvl(){return Math.floor(S.xp/200)+1}
 let WORLDS=[],ALL=[];
 function buildWorlds(){
 const b=band();const P=PHONICS,G=GRAMMAR;const [si,tt]=speakWorlds(b);
-WORLDS=[...P,vocabWorld(b),tt,...G,si];
+const X=window.studyWorlds?studyWorlds():{wt:[]};
+WORLDS=[...P,vocabWorld(b),X.vx,X.ck,tt,...G.filter(w=>w.id!=="w5"),X.rd,...X.wt,...G.filter(w=>w.id==="w5"),si].filter(w=>w&&w.units&&w.units.length);
 WORLDS.forEach(w=>{if(!w.band)w.band=WB[w.id]||[3,7]});
 ALL=[];WORLDS.forEach((w,wi)=>w.units.forEach((u,ui)=>ALL.push({w:wi,u:ui,id:w.id+"-"+ui})));
 }
@@ -43,10 +44,11 @@ function nextIndex(){let i=ALL.findIndex(x=>!S.done[x.id]&&isRec(WORLDS[x.w]));i
 /* ---------- 語音：美式英文 ---------- */
 let VOICE=null,RATE=.9;
 const BAD_VOICE=/albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|hysterical|deranged|pipe|fred|junior|ralph|kathy|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley/i;
-function scoreVoice(v){let s=/en[-_]US/i.test(v.lang)?100:/^en/i.test(v.lang)?10:-999;if(/natural|neural|online|premium|enhanced/i.test(v.name))s+=30;if(/google us english|samantha|ava|allison|aria|jenny|michelle|nicky|evan|joelle|zoe/i.test(v.name))s+=15;if(BAD_VOICE.test(v.name))s-=80;return s}
+function scoreVoice(v){let s=/en[-_]US/i.test(v.lang)?100:/^en/i.test(v.lang)?10:-999;const id=v.name+" "+v.voiceURI;if(/premium/i.test(id))s+=70;else if(/natural|neural|online/i.test(id))s+=60;else if(/enhanced/i.test(id))s+=45;if(/compact/i.test(id))s-=25;if(/google us english|samantha|ava|allison|aria|jenny|michelle|nicky|evan|joelle|zoe/i.test(v.name))s+=15;if(BAD_VOICE.test(v.name))s-=80;return s}
 function enVoices(){if(!("speechSynthesis"in window))return [];return speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>scoreVoice(b)-scoreVoice(a))}
 function pickVoice(){const vs=enVoices();if(!vs.length)return;VOICE=(S.voice&&vs.find(v=>v.voiceURI===S.voice))||vs[0];
-const note=document.getElementById("audio-note");note.classList.toggle("on",!/en[-_]US/i.test(VOICE.lang))}
+const note=document.getElementById("audio-note");const good=/premium|enhanced|natural|neural|online/i.test(VOICE.name+" "+VOICE.voiceURI);
+if(!/en[-_]US/i.test(VOICE.lang)){note.classList.add("on")}else if(!good&&/iPhone|iPad|Mac/i.test(navigator.userAgent)){note.innerHTML="🔊 目前是手機內建的精簡語音，聽起來比較像機器人。到 iPhone「設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文」下載 <b>Ava（高品質）</b>，再到「船長日誌」選它，就會變成自然的美國口音。";note.classList.add("on")}else note.classList.remove("on")}
 if("speechSynthesis"in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;setTimeout(()=>{if(!VOICE&&!enVoices().length)document.getElementById("audio-note").classList.add("on")},2500)}else document.getElementById("audio-note").classList.add("on");
 function utter(t,rate){const u=new SpeechSynthesisUtterance(t);if(VOICE)u.voice=VOICE;u.lang=VOICE?VOICE.lang:"en-US";u.rate=rate||RATE;return u}
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
@@ -54,11 +56,11 @@ function say(t,rate){return new Promise(res=>{if(!("speechSynthesis"in window)||
 let SEQ=0;
 /* 分段朗讀：每段之間停 gap 毫秒（字母音與範例字分開唸） */
 async function speakParts(parts,btn,rate,gap=800){if(!("speechSynthesis"in window))return;const my=++SEQ;btn&&btn.classList.add("playing");
-for(let i=0;i<parts.length;i++){if(my!==SEQ)return;await new Promise(res=>{speechSynthesis.cancel();const u=utter(parts[i],rate);u.onend=u.onerror=()=>res();speechSynthesis.speak(u);setTimeout(res,5000)});if(i<parts.length-1)await wait(gap)}
+for(let i=0;i<parts.length;i++){if(my!==SEQ)return;await new Promise(res=>{speechSynthesis.cancel();const u=utter(parts[i],rate);u.onend=u.onerror=()=>res();speechSynthesis.speak(u);setTimeout(res,Math.max(5000,parts[i].split(/\s+/).length*700/(rate||RATE)))});if(i<parts.length-1)await wait(gap)}
 if(my===SEQ&&btn)btn.classList.remove("playing")}
 function speak(t,btn,rate){if(!("speechSynthesis"in window)||!t)return;SEQ++;speechSynthesis.cancel();const u=utter(t,rate);
 if(btn){btn.classList.add("playing");u.onend=u.onerror=()=>btn.classList.remove("playing")}speechSynthesis.speak(u)}
-function stopAll(){if("speechSynthesis"in window)speechSynthesis.cancel();if(window.stopRec)stopRec()}
+function stopAll(){SEQ++;if(typeof TIMER!=="undefined")clearInterval(TIMER);if("speechSynthesis"in window)speechSynthesis.cancel();if(window.stopRec)stopRec()}
 function applyBand(){RATE=BANDS[band()].rate;buildWorlds()}
 applyBand();
 /* ---------- 上方狀態列 ---------- */
@@ -97,7 +99,7 @@ const idx=ALL.findIndex(x=>x.w===wi&&x.u===ui);const id=ALL[idx].id;
 const st=S.done[id]?"done":idx===nx?"now":"open";
 const n=document.createElement("div");n.className="node "+st;
 const stars=S.stars[id]?"★".repeat(S.stars[id])+"☆".repeat(3-S.stars[id]):"";
-n.innerHTML=`<button class="pin" aria-label="${u.t}">${st==="done"?"✓":u.i}</button><div class="label"><b>${u.t}</b><small>${st==="done"?"已通關，可重玩":st==="now"?`推薦下一關・${u.cards.length} 張卡片`:`${u.cards.length} 張卡片`}</small><div class="stars">${stars}</div></div>`;
+n.innerHTML=`<button class="pin" aria-label="${u.t}">${st==="done"?"✓":u.i}</button><div class="label"><b>${u.t}</b><small>${u.label?u.label():st==="done"?"已通關，可重玩":st==="now"?`推薦下一關・${u.cards.length} 張卡片`:`${u.cards.length} 張卡片`}</small><div class="stars">${stars}</div></div>`;
 n.querySelector(".pin").addEventListener("click",()=>startLesson(wi,ui));
 path.appendChild(n);
 });
@@ -107,8 +109,8 @@ m.appendChild(sec);
 /* ---------- 課程流程 ---------- */
 let L=null;
 function startLesson(wi,ui){
-const u=WORLDS[wi].units[ui];
-L={wi,ui,u,id:WORLDS[wi].id+"-"+ui,step:0,hearts:5,correct:0,combo:0,picked:null,total:u.cards.filter(c=>["listen","mc","order","speak"].includes(c.k)).length};
+const u0=WORLDS[wi].units[ui];const u=u0.dyn?Object.assign({},u0,{cards:u0.dyn()}):u0;
+L={wi,ui,u,id:WORLDS[wi].id+"-"+ui,step:0,hearts:5,correct:0,combo:0,picked:null,total:u.cards.filter(c=>["listen","mc","order","speak","input","rq","wfree"].includes(c.k)).length};
 show("scr-lesson");renderStep();
 }
 function hl(w,h){if(!h)return w;
@@ -128,6 +130,7 @@ $("#prog").style.width=(L.step/L.u.cards.length*100)+"%";
 if(!c){finish(true);return}
 const tag=`<span class="tag">${WORLDS[L.wi].name}｜${L.u.t}</span>`;
 const next=`<button class="cta" id="next">${L.step===L.u.cards.length-1?"完成這關":"下一張"}</button>`;
+if(window.renderStudy&&window.renderStudy(c,b,tag,next)){window.scrollTo(0,0);return}
 if(c.k==="info"){
 b.innerHTML=`<div class="card">${tag}<h3>${c.h}</h3><p>${c.p}</p>${c.say?`<div class="play-row"><button class="play" id="p1">🔊 聽整組</button></div>`:""}</div>${next}`;
 if(c.say)$("#p1").onclick=e=>speak(c.say,e.currentTarget);
@@ -176,7 +179,7 @@ $("#next").onclick=()=>{stopAll();L.step++;renderStep()};
 function check(isRight,answerText,explain){
 const opts=[...document.querySelectorAll(".opt")];const fb=$("#fb");
 opts.forEach(o=>o.disabled=true);
-const sel=opts.find(o=>o.classList.contains("sel"));const ok=isRight(sel);
+const sel=opts.find(o=>o.classList.contains("sel"));const ok=isRight(sel);const cc=L.u.cards[L.step];if(!ok&&cc&&cc.vw&&window.addWrong)addWrong(cc.vw);
 opts.find(isRight).classList.add("ok");if(!ok)sel.classList.add("bad");
 if(ok){window.sfx&&sfx.ok(L.combo+1);L.correct++;L.combo++;fb.className="feedback on ok";fb.innerHTML=`${["太棒了！","正確！","漂亮！","就是這樣！"][L.combo%4]}<small>${explain}</small>`;if(L.combo>=2)showCombo(L.combo)}
 else{window.sfx&&sfx.bad();L.combo=0;L.hearts--;fb.className="feedback on bad";fb.innerHTML=`差一點。正確答案：${answerText}<small>${explain}</small>`;$("#hearts").textContent="❤".repeat(L.hearts)+"♡".repeat(5-L.hearts);if(/[A-Za-z]{2,}/.test(answerText))setTimeout(()=>speak(clean(answerText)),300)}
@@ -215,6 +218,10 @@ const BADGES=[
 {id:"p4",em:"🔗",n:"子音峽船長",d:"通過子音峽",t:()=>worldDone("p4")},
 {id:"w2",em:"🧱",n:"基礎文法",d:"通過基礎灣",t:()=>worldDone("w2")},
 {id:"w4",em:"🌊",n:"高階文法",d:"通過深海峽",t:()=>worldDone("w4")},
+{id:"ladder",em:"🪜",n:"單字攀登者",d:"完成 10 組 5.5 單字",t:()=>Object.keys(S.done).filter(k=>k.startsWith("vx-")).length>=10},
+{id:"chef",em:"👨‍🍳",n:"廚房英文通",d:"通過西廚英文",t:()=>worldDone("ck")},
+{id:"reader",em:"🗼",n:"閱讀達人",d:"完成 6 篇閱讀",t:()=>Object.keys(S.done).filter(k=>k.startsWith("rd-")).length>=6},
+{id:"writer",em:"✍️",n:"動筆了",d:"完成一篇 Task 2",t:()=>Object.keys(S.drafts||{}).some(k=>k.startsWith("wb-")&&S.drafts[k].split(/\s+/).length>=250)},
 {id:"vocab",em:"📚",n:"單字收藏家",d:"完成一組分級單字",t:()=>anyDone("v")},
 {id:"speak",em:"🎙️",n:"開口說",d:"完成一關口說練習",t:()=>anyDone("si")||anyDone("tt")},
 {id:"travel",em:"🌏",n:"旅行達人",d:"完成五大旅行會話",t:()=>worldDone("tt")},
@@ -227,7 +234,7 @@ function renderVoicePick(){
 const el=$("#voice-pick");const vs=enVoices();
 if(!vs.length){el.innerHTML=`<p class="tip">這台裝置沒有英文語音。iPhone：設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文，下載「美國」語音。</p>`;return}
 el.innerHTML=`<select id="voice-sel">${vs.map(v=>`<option value="${v.voiceURI}" ${VOICE&&v.voiceURI===VOICE.voiceURI?"selected":""}>${v.name}（${v.lang}）${/en[-_]US/i.test(v.lang)?" 美式":""}</option>`).join("")}</select><button class="chip" id="voice-test">🔊 試聽</button>
-<p class="tip">建議選有「美式」標記的語音；名稱有 Natural、Enhanced、Premium 的音質最好。</p>`;
+<p class="tip">聽起來像機器人，多半是手機只有內建的「精簡版」語音。<b>iPhone 免費下載自然人聲：</b>設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文 → 選「Ava（高品質）」、「Zoe（高品質）」或「Evan（增強）」並下載（約 100–400MB，建議連 Wi‑Fi）。下載完回到這裡選它；名稱有 Premium／高品質、Enhanced／增強 的最自然。</p>`;
 $("#voice-sel").onchange=e=>{S.voice=e.target.value;save();pickVoice();speak("Hello! Welcome aboard. Let's practice English together.")};
 $("#voice-test").onclick=()=>speak("Hello! Welcome aboard. Let's practice English together.");
 }
